@@ -159,7 +159,7 @@ function App() {
       <section id="center">
         <div className="header">
           <div className="title">
-            <h1><span className="react-logo"><img src="src/assets/react.svg" alt="react" /></span>Atomic Calculator </h1>
+            <h1>Atomic Calculator </h1>
 
             <p>A Super Simple Calculator Built With React</p>
 
