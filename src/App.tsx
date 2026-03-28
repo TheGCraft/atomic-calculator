@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from 'react'
+import { useState, type KeyboardEvent, useEffect } from 'react'
 import './App.css';
 
 type CalcButton = {
@@ -7,14 +7,56 @@ type CalcButton = {
   id: number;
 };
 function App() {
+
+
   //State to store the current input
   const [display, setDisplay] = useState<string>("");
   //State to store the result
   const [result, setResult] = useState<string>("0");
   //Function to add a value to the display
   const addValue = (value: string) => {
-    setDisplay((prev: string) => prev + value);
+    setDisplay((prev: string) => {
+      //If the last character is an operator and the new value is an operator, replace the last character with the new value
+      const lastChar = prev.slice(-1);
+      const operators = ["+", "-", "*", "/"];
+
+      //Prevent multiple leading zeros
+      if (prev === "0" && value === "0") {
+        return prev;
+      }
+      //If current value is 0 and the new value is not 0, replace the 0 with the new value
+      if (prev === "0" && !isNaN(Number(value))) {
+        return value;
+      }
+      //Prevent leading zeros after an operator
+      if (operators.includes(lastChar) && value === "0") {
+        return prev;
+      }
+      //Prevent consecutive operators
+      if (operators.includes(lastChar) && operators.includes(value)) {
+        return prev.slice(0, -1) + value;
+      }
+      //Prevent multiple decimal points
+      if (value === "." && prev.includes(".")) {
+        return prev;
+      }
+      //Prevent multiple decimal points after an operator
+      if (operators.includes(lastChar) && value === ".") {
+        return prev;
+      }
+      //Prevent multiple decimal points after an operator
+      if (operators.includes(lastChar) && value === ".") {
+        return prev;
+      }
+
+      return prev + value;
+
+    });
   };
+
+
+
+
   //Function to clear the display
   const clearAll: () => void = () => {
     setDisplay("");
@@ -27,7 +69,10 @@ function App() {
   //Function to calculate the result
   const calculateResult: () => void = () => {
     try {
-      const evalResult: number = eval(display);
+      //Regex to find numbers with leading zeros
+      const sanitizedDisplay = display.replace(/\b0+(?=\d)/g, '');
+
+      const evalResult: number = eval(sanitizedDisplay);
       setResult(evalResult.toString());
       setDisplay(evalResult.toString());
     } catch (error) {
@@ -50,6 +95,17 @@ function App() {
       addValue(key);
     }
   }
+
+  //useEffect to handle keyboard input
+  useEffect(() => {
+    const handler = (e: any) => {
+      handleKeyPress(e);
+    }
+    window.addEventListener("keydown", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+    }
+  }, [display]);
 
   const buttons: CalcButton[] = [
     {
