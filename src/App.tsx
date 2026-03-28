@@ -1,4 +1,5 @@
-import { useState, type KeyboardEvent, useEffect } from 'react'
+import { useState, type KeyboardEvent, useEffect } from 'react';
+import { evaluate } from 'mathjs';
 import './App.css';
 
 type CalcButton = {
@@ -19,35 +20,24 @@ function App() {
       //If the last character is an operator and the new value is an operator, replace the last character with the new value
       const lastChar = prev.slice(-1);
       const operators = ["+", "-", "*", "/"];
-
-      //Prevent multiple leading zeros
-      if (prev === "0" && value === "0") {
-        return prev;
-      }
-      //If current value is 0 and the new value is not 0, replace the 0 with the new value
-      if (prev === "0" && !isNaN(Number(value))) {
-        return value;
-      }
-      //Prevent leading zeros after an operator
-      if (operators.includes(lastChar) && value === "0") {
-        return prev;
-      }
+      //If empty and starting with an operator except minus, ignore or ad 0
+      if (prev === "" && ["+", "*", "/", "%"].includes(value)) return prev;
       //Prevent consecutive operators
       if (operators.includes(lastChar) && operators.includes(value)) {
         return prev.slice(0, -1) + value;
       }
-      //Prevent multiple decimal points
-      if (value === "." && prev.includes(".")) {
-        return prev;
+      // If the "number" being typed is just "0", replace it with the new digit
+      // But allow "0."
+      const parts = prev.split(/[\+\-\*\/\%]/);
+      const currentNumber = parts[parts.length - 1];
+      if (currentNumber === "0" && !isNaN(Number(value)) && value !== ".") {
+        return prev.slice(0, -1) + value;
       }
-      //Prevent multiple decimal points after an operator
-      if (operators.includes(lastChar) && value === ".") {
-        return prev;
-      }
-      //Prevent multiple decimal points after an operator
-      if (operators.includes(lastChar) && value === ".") {
-        return prev;
-      }
+
+      //Prevent multiple decimals in one number
+      if (value === "." && currentNumber.includes(".")) return prev;
+
+
 
       return prev + value;
 
@@ -69,12 +59,12 @@ function App() {
   //Function to calculate the result
   const calculateResult: () => void = () => {
     try {
-      //Regex to find numbers with leading zeros
-      const sanitizedDisplay = display.replace(/\b0+(?=\d)/g, '');
+      const evalResult = evaluate(display);
+      //Avoid long floating point strings
+      const formattedResult = Number(evalResult.toFixed(10)).toString();
 
-      const evalResult: number = eval(sanitizedDisplay);
-      setResult(evalResult.toString());
-      setDisplay(evalResult.toString());
+      setResult(formattedResult);
+      setDisplay(formattedResult);
     } catch (error) {
       setResult("Error");
     }
@@ -85,9 +75,9 @@ function App() {
     if (key === "Enter") {
       calculateResult();
 
-    } else if (key === "Escape") {
+    } else if (key === "Escape" || key === "c") {
       clearAll();
-    } else if (key === "Backspace") {
+    } else if (key === "Backspace" || key === "Delete") {
       deleteLast();
     } else if (key === "+" || key === "-" || key === "*" || key === "/" || key === "." || key === "(" || key === ")" || key === "%") {
       addValue(key);
