@@ -213,7 +213,7 @@ function App() {
         </div>
         <div className="container">
           <div className="calculator">
-            <div className="expression">{display || "0"}</div>
+            <div className="expression" style={{ fontSize: display.length > 15 ? '1.2rem' : '2rem' }}>{display || "0"}</div>
             <div className="display" onKeyDown={handleKeyPress} tabIndex={0}>{result}</div>
             <div className="buttons">
               {buttons.map((button) => {

@@ -38,6 +38,8 @@ span.react-logo {
 }
 
 .calculator {
+  overflow: hidden;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   border: hidden;
@@ -73,6 +75,10 @@ span.react-logo {
 }
 
 .expression {
+  overflow-x: auto;
+  white-space: nowrap;
+  text-align: right;
+  padding-left: 10px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -84,6 +90,11 @@ span.react-logo {
   box-sizing: border-box;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
   color: #000;
+}
+
+.expression::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 .buttons {
