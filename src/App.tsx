@@ -34,6 +34,11 @@ function App() {
         return prev.slice(0, -1) + value;
       }
 
+      //Show 0 before a decimal point
+      if (value === "." && currentNumber === "") {
+        return prev + "0.";
+      }
+
       //Prevent multiple decimals in one number
       if (value === "." && currentNumber.includes(".")) return prev;
 
